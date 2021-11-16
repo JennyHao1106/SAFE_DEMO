@@ -1,0 +1,6 @@
+place_name:91,
+alarm_state:42,
+cam_name:3,
+alarm_time:16-53-54,
+alarm_type:4,
+picture_url:D\dd.jpg

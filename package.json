@@ -1,0 +1,15 @@
+{
+  "name": "safe-demo-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "HJY",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "node-schedule": "^2.0.0"
+  }
+}

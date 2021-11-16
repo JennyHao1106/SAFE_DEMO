@@ -1,5 +1,5 @@
 1.每个数据存储在一个TXT中。
 2.每次读取完后删除txt。
-
+test
 
 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

@@ -1,4 +1,5 @@
 const fs = require("fs");
+const dbPath = "./db/"
 //获取该目录下的所有文件
 function readFiles(pathName) {
   let dirs = [];
@@ -41,7 +42,7 @@ function getOldDb(carme) {
       dbName = "db3.json";
     }
     let content = fs.readFileSync(
-      "E:/HJY/WORKSPACE/safe-demo-server/db/" + dbName
+      dbPath + dbName
     );
     if (content.toString().trim().length == 0) {
       return "";
@@ -52,7 +53,12 @@ function getOldDb(carme) {
     console.log("oldDb false");
   }
 }
-function main(pathName, readCarme) {
+/**
+ * 读取文件
+ * @param {*} pathName 
+ * @param {*} readCarme 
+ */
+function jobOne(pathName, readCarme) {
   if (readFiles(pathName).length == 0) {
     console.log("文件夹为空");
   } else {
@@ -68,11 +74,11 @@ function main(pathName, readCarme) {
     } else {
       dataOfDb = JSON.parse(getOldDb(readCarme));
     }
-       let writePath = "";
+    let writePath = "";
     if (readCarme == 1) {
-      writePath = "E:/HJY/WORKSPACE/safe-demo-server/db/db1.json";
+      writePath = dbPath + "db1.json";
     } else if (readCarme == 3) {
-      writePath = "E:/HJY/WORKSPACE/safe-demo-server/db/db3.json";
+      writePath = dbPath + "db3.json";
     }
     /**
      *将新的数据放到数组中，然后统一转换为写入json文件中（writeFile覆盖写入）
@@ -89,7 +95,6 @@ function main(pathName, readCarme) {
         console.log("重写失败：", err);
         return;
       } else {
-        console.log("删除文件");
         for (let index = 0; index < fileNames.length; index++) {
           fs.unlink(pathName + "/" + fileNames[index], function (error) {
             if (error) {
@@ -103,4 +108,21 @@ function main(pathName, readCarme) {
     });
   }
 }
-exports.main = main;
+
+/**
+ * 获取今天需读取的文件目录
+ */
+function jobTwo() {
+  let dirName = "";
+  let nowTime = new Date();
+  let year = nowTime.getFullYear().toString().slice(2);
+  let month = (nowTime.getMonth()+1).toString().length<2?'0'+(nowTime.getMonth()+1).toString():(nowTime.getMonth()+1).toString();
+  let day = nowTime.getDate().toString().length<2?'0'+nowTime.getDate().toString():nowTime.getDate().toString();
+  dirName = year+'-'+month+'-'+day
+  return dirName
+}
+
+
+
+exports.jobOne = jobOne;
+exports.jobTwo = jobTwo;

@@ -1,12 +1,45 @@
 const fs = require("fs");
+let express = require('express');
+let router = express.Router();
+let readPath = "./db/db1.json"
+
+router.get('/history/list',(req,res)=>{
+  fs.readFile(readPath, "UTF-8", function (err, data) {
+    let result = {};
+    if (err) {
+      result = {
+        code: 500,
+        msg: err,
+      };
+      res.status(500).send(result);
+    } else {
+      if (data.toString().trim().length == 0) {
+        result = {
+          code: 500,
+          msg: "正在读取文件",
+        };
+        res.status(500).send(result);
+      } else {
+        let dataOfDb = JSON.parse(data.toString()).list;
+        dataOfDb.reverse();
+        result = {
+          code: 200,
+          data: {
+            list: dataOfDb,
+            total: dataOfDb.length,
+          },
+        };
+        res.status(200).send(result);
+      }
+      
+    }
+  });
+})
 /**
  *
  * @param {放置地点} readPath
  */
 function queryDb(readPath) {
-  // let pageNum = _pageNum;
-  // let pageSize = _pageSize;
-  // let queryRes = [];
   let promise = new Promise((resolve, reject) => {
     fs.readFile(readPath, "UTF-8", function (err, data) {
       let result = {};
@@ -26,17 +59,6 @@ function queryDb(readPath) {
         } else {
           let dataOfDb = JSON.parse(data.toString()).list;
           dataOfDb.reverse();
-          // for (
-          //   let index = pageSize * (pageNum - 1);
-          //   index <
-          //   (pageSize * (pageNum + 1) > dataOfDb.length
-          //     ? dataOfDb.length
-          //     : pageSize * (pageNum + 1));
-          //   index++
-          // ) {
-          //   queryRes.push(dataOfDb[index]);
-          //   console.log(dataOfDb[index]);
-          // }
           result = {
             code: 200,
             data: {
@@ -52,7 +74,7 @@ function queryDb(readPath) {
   });
   return promise;
 }
-exports.queryDb = queryDb;
+module.exports = router;
 // queryDb(1, 10)
 //   .then((res) => {
 //     console.log(res);

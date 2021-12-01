@@ -9,8 +9,8 @@ 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
 
 
 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
-
+--server token
 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
 
-
+--web token
 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

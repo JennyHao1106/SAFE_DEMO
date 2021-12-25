@@ -3,9 +3,13 @@ const dbPath = "./db/"
 //获取该目录下的所有文件
 function readFiles(pathName) {
   let dirs = [];
-  fs.readdirSync(pathName).forEach((file, index) => {
-    dirs.push(file);
-  });
+  try {
+    fs.readdirSync(pathName).forEach((file, index) => {
+      dirs.push(file);
+    });
+  } catch (error) {
+    
+  }
   return dirs;
 }
 /**

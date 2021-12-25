@@ -11,7 +11,8 @@ const faceSafe = require('./router/faceSafe')
 const faceInfo = require('./router/faceInfo')
 let config;
 let dirName;
-if (process.env.NODE_ENV === 'production') {
+
+if (process.env.NODE_ENV == 'production') {
     config = require('./prod.js')
 } else {
     config = require('./dev.js')
@@ -35,7 +36,7 @@ app.listen(config.port, () => {
 
 app.use('/prodsafe', prodSafe);
 app.use('/facesafe', faceSafe);
-app.use('/faceinfo', faceInfo)
+app.use('/faceinfo', faceInfo);
 
 //定时器 每天更新目录文件 每天凌晨更新
 const scheduleCronTwo = () => {

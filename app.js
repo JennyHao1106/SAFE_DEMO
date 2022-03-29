@@ -50,7 +50,13 @@ dirName = config.camerPath + getDataJob.jobTwo()
 const scheduleCronOne = () => {
     schedule.scheduleJob('30 * * * * *', () => {
         getDataJob.jobOne(dirName + '/carme3', 3);
-        getDataJob.jobOne(dirName + '/carme1', 1);
+       // getDataJob.jobOne(dirName + '/carme1', 1); 以后人员信息从接口中获取，不再读取文件
+    });
+}
+
+const scheduleCronForHK = () => {
+    schedule.scheduleJob('*/5 * * * *', () => {
+        getDataJob.jobToGetHK(config.faceUrl)
     });
 }
 
@@ -58,6 +64,7 @@ const scheduleCronOne = () => {
 
 // scheduleCronOne();
 // scheduleCronTwo();
+scheduleCronForHK();
 
 
 

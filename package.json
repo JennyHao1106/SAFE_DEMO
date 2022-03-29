@@ -5,13 +5,16 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev":"set NODE_ENV=development&& node app.js",
-    "prod":"set NODE_ENV=production&& node app.js"
+    "dev": "set NODE_ENV=development&& supervisor app.js",
+    "prod": "set NODE_ENV=production&& node app.js"
   },
   "author": "HJY",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
-    "node-schedule": "^2.0.0"
+    "node-schedule": "^2.0.0",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6",
+    "supervisor": "^0.12.0"
   }
 }

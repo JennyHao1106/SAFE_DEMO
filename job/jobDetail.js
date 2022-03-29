@@ -1,4 +1,6 @@
 const fs = require("fs");
+
+const request = require('request-promise');
 const dbPath = "./db/"
 //获取该目录下的所有文件
 function readFiles(pathName) {
@@ -8,7 +10,7 @@ function readFiles(pathName) {
       dirs.push(file);
     });
   } catch (error) {
-    
+    console.log("目录不存在");
   }
   return dirs;
 }
@@ -120,13 +122,113 @@ function jobTwo() {
   let dirName = "";
   let nowTime = new Date();
   let year = nowTime.getFullYear().toString().slice(2);
-  let month = (nowTime.getMonth()+1).toString().length<2?'0'+(nowTime.getMonth()+1).toString():(nowTime.getMonth()+1).toString();
-  let day = nowTime.getDate().toString().length<2?'0'+nowTime.getDate().toString():nowTime.getDate().toString();
-  dirName = year+'-'+month+'-'+day
+  let month = (nowTime.getMonth() + 1).toString().length < 2 ? '0' + (nowTime.getMonth() + 1).toString() : (nowTime.getMonth() + 1).toString();
+  let day = nowTime.getDate().toString().length < 2 ? '0' + nowTime.getDate().toString() : nowTime.getDate().toString();
+  dirName = year + '-' + month + '-' + day
   return dirName
+}
+
+/**
+ * @description 用于处理hk传入的日期数据的处理之后再写入json文件
+ * @param {*} fmt 转换后的日期格式
+ * @param {*} date  传入的日期 格式为：2022-03-26T16:36:23+08:00
+ * @returns 
+ */
+function dateFormat(fmt, date) {
+  let ret = "";
+  date = new Date(date);
+  console.log(date)
+  const opt = {
+    'Y+': date.getFullYear().toString(), // 年
+    'm+': (date.getMonth() + 1).toString(), // 月
+    'd+': date.getDate().toString(), // 日
+    'H+': date.getHours().toString(), // 时
+    'M+': date.getMinutes().toString(), // 分
+    'S+': date.getSeconds().toString() // 秒
+    // 有其他格式化字符需求可以继续添加，必须转化成字符串
+  }
+  for (let k in opt) {
+    ret = new RegExp('(' + k + ')').exec(fmt);
+    console.log(ret)
+    if (ret) {
+      fmt = fmt.replace(
+        ret[1],
+        ret[1].length == 1 ? opt[k] : opt[k].padStart(ret[1].length, '0')
+      )
+    }
+  }
+  return fmt
 }
 
 
 
+
+function writeDataToDBOne(data, total) {
+  /**
+     * 将原本的db.json中的数据读取出来并且转换成为数组
+     */
+  let dataOfDb = {};
+  if (getOldDb(1) == "") {
+    console.log("getOldDb()");
+    dataOfDb.list = [];
+    dataOfDb.total = 0;
+  } else {
+    dataOfDb = JSON.parse(getOldDb(1));
+  }
+  dataOfDb.total += total;
+  data.forEach(item => {
+    dataOfDb.list.push(item);
+  })
+  fs.writeFile(dbPath + "db1.json", JSON.stringify(dataOfDb), (err) => {
+    if (err) {
+      console.log("重写失败：", err);
+      return;
+    } else {
+      console.log("重写成功");
+    }
+  });
+
+}
+
+
+/**
+ * @description 定时JOB 用于调用海康的接口获取数据
+ * @param {*} pathName  写入文件db1.json的路径
+ * @param {*} reqUrl  海康的URL
+ */
+ function jobToGetHK(reqUrl) {
+  let endTime = new Date().getTime();
+  let startTime = endTime - 300000;
+  endTime = (new Date(endTime).toISOString().split(".")[0]) + '+08:00';
+  startTime = (new Date(startTime).toISOString().split(".")[0]) + '+08:00';
+  let requestData = {
+    pageNo: 1,
+    pageSize: 1000,
+    startTime: startTime,
+    endTime: endTime
+  }
+  console.log(requestData);
+  console.log(reqUrl);
+  request({
+    url: reqUrl,
+    method: "POST",
+    json: true,
+    headers: {
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(requestData)
+  }).then(res => {
+    console.log(res)
+    let count = res.data.total
+    let data = res.data.list
+    writeDataToDBOne(data, count)
+    
+  }).catch(err => {
+    console.log(err)
+  })
+  
+}
+
 exports.jobOne = jobOne;
 exports.jobTwo = jobTwo;
+exports.jobToGetHK = jobToGetHK;
